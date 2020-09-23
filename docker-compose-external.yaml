@@ -1,0 +1,83 @@
+version: '2'
+
+services:
+  etcd1:
+    image: quay.io/coreos/etcd:v3.3.25
+    networks:
+      - vault-etcd
+    ports:
+      - 23791:2379
+    environment:
+      - ETCD_NAME=etcd1
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd1:2380
+      - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=https://172.25.82.61:23791
+      - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
+      - ETCD_INITIAL_CLUSTER=etcd1=https://etcd1:2380,etcd2=https://etcd2:2380,etcd3=https://etcd3:2380
+      - ETCD_INITIAL_CLUSTER_STATE=new
+      - ETCD_AUTO_TLS=false
+      - ETCD_PEER_AUTO_TLS=true
+      - ETCD_CLIENT_CERT_AUTH=true
+      - ETCD_TRUSTED_CA_FILE=/data/etcd/certs/etcd-root-ca.pem
+      - ETCD_CERT_FILE=/data/etcd/certs/etcd1.pem
+      - ETCD_KEY_FILE=/data/etcd/certs/etcd1-key.pem
+    volumes:
+      - ./etcd:/data/etcd
+  etcd2:
+    image: quay.io/coreos/etcd:v3.3.25
+    networks:
+      - vault-etcd
+    ports:
+      - 23792:2379
+    environment:
+      - ETCD_NAME=etcd2
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd2:2380
+      - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=https://172.25.82.61:23792
+      - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
+      - ETCD_INITIAL_CLUSTER=etcd1=https://etcd1:2380,etcd2=https://etcd2:2380,etcd3=https://etcd3:2380
+      - ETCD_INITIAL_CLUSTER_STATE=new
+      - ETCD_AUTO_TLS=false
+      - ETCD_PEER_AUTO_TLS=true
+      - ETCD_CLIENT_CERT_AUTH=true
+      - ETCD_TRUSTED_CA_FILE=/data/etcd/certs/etcd-root-ca.pem
+      - ETCD_CERT_FILE=/data/etcd/certs/etcd2.pem
+      - ETCD_KEY_FILE=/data/etcd/certs/etcd2-key.pem
+    volumes:
+      - ./etcd:/data/etcd
+  etcd3:
+    image: quay.io/coreos/etcd:v3.3.25
+    networks:
+      - vault-etcd
+    ports:
+      - 23793:2379
+    environment:
+      - ETCD_NAME=etcd3
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd3:2380
+      - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=https://172.25.82.61:23793
+      - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
+      - ETCD_INITIAL_CLUSTER=etcd1=https://etcd1:2380,etcd2=https://etcd2:2380,etcd3=https://etcd3:2380
+      - ETCD_INITIAL_CLUSTER_STATE=new
+      - ETCD_AUTO_TLS=false
+      - ETCD_PEER_AUTO_TLS=true
+      - ETCD_CLIENT_CERT_AUTH=true
+      - ETCD_TRUSTED_CA_FILE=/data/etcd/certs/etcd-root-ca.pem
+      - ETCD_CERT_FILE=/data/etcd/certs/etcd3.pem
+      - ETCD_KEY_FILE=/data/etcd/certs/etcd3-key.pem
+    volumes:
+      - ./etcd:/data/etcd
+  e3w:
+    image: soyking/e3w:latest
+    volumes:
+      - ./etcd/etcd-ui/config.external.ini:/app/conf/config.default.ini
+      - ./etcd:/data/etcd
+    ports:
+      - "8080:8080"
+    networks:
+      - vault-etcd
+networks:
+  vault-etcd:
